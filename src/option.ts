@@ -1,3 +1,5 @@
+import { Either, left, right } from "./either";
+
 export abstract class Option<T> {
   abstract get(): T;
   readonly abstract isEmpty: boolean;
@@ -60,6 +62,13 @@ export abstract class Option<T> {
     return this.exists(t => t === value);
   }
 
+  toEither<L>(leftValue: L): Either<L, T>{
+    return this.match<Either<L, T>>(
+      t => right(t),
+      () => left(leftValue),
+    );
+  }
+
   toString() {
       return this.fold(t => `Some(${String(t)})`, 'None');
   }
@@ -97,16 +106,3 @@ export class None extends Option<never> {
 
 export const some = <T>(t: T) => new Some(t);
 export const none = new None();
-
-const randomInt = Math.floor(Math.random() * 10);
-const safeDivide = (n: number, d: number): Option<number> => d === 0 ? none : some(n / d);
-
-const maybeEven: Option<number> = randomInt % 2 === 0 ? some(randomInt) : none;
-
-maybeEven.map(x => -x).print();
-maybeEven.replace('hello').print()
-console.log(maybeEven.getOrElse(Math.PI));
-
-maybeEven.flatMap(n => safeDivide(3, n)).print();
-
-const flattened = some(some('hello')).flatten();

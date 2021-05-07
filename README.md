@@ -1,2 +1,3 @@
 # ts-monads
-Scala-like monads in typescript
+
+An attempt at a Typescript version of Scalas `Either` and `Option` monads. 

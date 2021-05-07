@@ -1,6 +1,7 @@
+import { Option, some, none, None } from './option';
 export abstract class Either<L, R> {
   abstract isRight(): this is Right<L, R>;
-  protected abstract get(): R;
+  abstract get(): R;
   abstract asInstanceOfLeft<T = R>(): Left<L, T>;
   abstract asInstanceOfRight<T = L>(): Right<T, R>;
   protected abstract leftGet(): L;
@@ -67,6 +68,13 @@ export abstract class Either<L, R> {
     return this.exists(t => t === value);
   }
 
+  toOption(): Option<R> {
+    return this.match<Option<R>>(
+      () => none,
+      r => some(r),
+    );
+  }
+
   toString() {
       return this.fold(r => `Right(${String(r)})`, l => `Left(${String(l)})`);
   }
@@ -114,7 +122,7 @@ export class Left<L, R> extends Either<L, R> {
 
   readonly isRight = () => false;
 
-  protected get(): never {
+  get(): never {
     throw new Error('Tried to get value of Left');
   }
 
@@ -211,6 +219,14 @@ class LeftProjection<L, R> {
   contains(value: L) {
     return this.exists(t => t === value);
   }
+
+  toOption(): Option<L> {
+    return this.either.match<Option<L>>(
+      l => some(l),
+      () => none,
+    );
+  }
+
 
 }
 
